@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>로그인 페이지</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>로그인 페이지</h2>
+  <input type="text" id="username" placeholder="아이디"><br>
+  <input type="password" id="password" placeholder="비밀번호"><br>
+  <button onclick="login()">로그인</button>
+
+  <div id="status"></div>
+
+  <script>
+    function login() {
+      const id = document.getElementById("username").value;
+      const pw = document.getElementById("password").value;
+      const status = document.getElementById("status");
+
+      const validId = "admin";
+      const validPw = "1234";
+
+      if (id === validId && pw === validPw) {
+        status.textContent = `${id}님, 로그인 성공!`;
+        status.style.color = "green";
+        // 로그인 성공 후 다른 페이지로 이동하려면 아래 주석 해제
+        // window.location.href = "welcome.html";
+      } else {
+        status.textContent = "아이디 또는 비밀번호가 틀렸습니다.";
+        status.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
