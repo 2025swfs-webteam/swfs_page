@@ -1,56 +1,44 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>로그인 페이지</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-    }
-    input {
-      padding: 10px;
-      margin: 10px;
-      width: 200px;
-    }
-    button {
-      padding: 10px 20px;
-    }
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-      color: green;
-    }
-  </style>
-</head>
-<body>
-  <h2>로그인 페이지</h2>
-  <input type="text" id="username" placeholder="아이디"><br>
-  <input type="password" id="password" placeholder="비밀번호"><br>
-  <button onclick="login()">로그인</button>
+# vulnerable_app.py
+from flask import Flask, request, render_template_string
 
-  <div id="status"></div>
+app = Flask(__name__)
 
-  <script>
-    function login() {
-      const id = document.getElementById("username").value;
-      const pw = document.getElementById("password").value;
-      const status = document.getElementById("status");
+# 취약한 로그인 폼 (SQL Injection 가능)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-      const validId = "admin";
-      const validPw = "1234";
+        # 실제 DB 없이 단순 문자열 비교지만, 시뮬레이션을 위해 SQL 문을 그대로 노출
+        query = f"SELECT * FROM users WHERE email = '{email}' AND password = '{password}'"
+        print("[!] 실행된 쿼리:", query)
 
-      if (id === validId && pw === validPw) {
-        status.textContent = `${id}님, 로그인 성공!`;
-        status.style.color = "green";
-        // 로그인 성공 후 다른 페이지로 이동하려면 아래 주석 해제
-        // window.location.href = "welcome.html";
-      } else {
-        status.textContent = "아이디 또는 비밀번호가 틀렸습니다.";
-        status.style.color = "red";
-      }
-    }
-  </script>
-</body>
-</html>
+        if email == "' OR 1=1--":
+            return "<h1>Login 성공! (SQL Injection)</h1>"
+        else:
+            return "<h1>Login 실패</h1>"
+
+    return '''
+        <form method="post">
+            Email: <input name="email"><br>
+            Password: <input name="password"><br>
+            <button type="submit">Login</button>
+        </form>
+    '''
+
+# 취약한 검색 (DOM XSS 가능)
+@app.route('/search')
+def search():
+    q = request.args.get('q', '')
+    return render_template_string(f'''
+        <h1>Search Page</h1>
+        <form method="get">
+            <input name="q" value="{q}">
+            <button type="submit">Search</button>
+        </form>
+        <p>검색 결과: {q}</p>
+    ''')
+
+if __name__ == '__main__':
+    app.run(debug=True)
